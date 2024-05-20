@@ -1,0 +1,20 @@
+<form id="productForm">
+    <div class="form-group">
+        <label for="productName">Product Name</label>
+        <input type="text" class="form-control" id="productName" name="product_name" required>
+    </div>
+    <div class="form-group">
+        <label for="uomId">Unit of Measure</label>
+        <select class="form-control" id="uomId" name="uom_id" required>
+            <option value="">Select Unit of Measure</option>
+            {% for uom in uoms %}
+            <option value="{{ uom.uom_id }}">{{ uom.uom_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="pricePerUnit">Price Per Unit</label>
+        <input type="number" class="form-control" id="pricePerUnit" name="price_per_unit" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>

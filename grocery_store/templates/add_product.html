@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product{% endblock %}
+
+{% block content %}
+    <h1 class="mt-5">Add New Product</h1>
+    <form method="post" action="/insertProduct">
+        <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input type="text" class="form-control" id="productName" name="product_name" required>
+        </div>
+        <div class="form-group">
+            <label for="uomId">UOM</label>
+            <select class="form-control" id="uomId" name="uom_id" required>
+                {% for uom in uoms %}
+                    <option value="{{ uom.uom_id }}">{{ uom.uom_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="pricePerUnit">Price Per Unit</label>
+            <input type="number" step="0.01" class="form-control" id="pricePerUnit" name="price_per_unit" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Product</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Add Order{% endblock %}
+
+{% block content %}
+    <h1 class="mt-5">Add New Order</h1>
+    <form id="orderForm" method="post" action="/insertOrder">
+        <div class="form-group">
+            <label for="customerName">Customer Name</label>
+            <input type="text" class="form-control" id="customerName" name="customer_name" required>
+        </div>
+        <div id="orderDetailsContainer">
+            <div class="order-detail">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="productId">Product</label>
+                        <select class="form-control product-select" name="product_id[]" required>
+                            {% for product in products %}
+                                <option value="{{ product.product_id }}" data-price="{{ product.price_per_unit }}" data-uom="{{ product.uom_name }}">{{ product.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="uomName">UOM</label>
+                        <input type="text" class="form-control uom-name" readonly>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="pricePerUnit">Price</label>
+                        <input type="number" class="form-control price-per-unit" readonly>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="quantity">Quantity</label>
+                        <input type="number" class="form-control quantity" name="quantity[]" value="1" min="1" required>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label for="totalPrice">Total</label>
+                        <input type="number" class="form-control total-price" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary" id="addProductBtn">Add Another Product</button>
+        <button type="submit" class="btn btn-primary mt-3">Submit Order</button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateTotalPrice(detailElement) {
+                const pricePerUnit = parseFloat(detailElement.querySelector('.product-select').selectedOptions[0].dataset.price);
+                const quantity = parseInt(detailElement.querySelector('.quantity').value);
+                detailElement.querySelector('.price-per-unit').value = pricePerUnit;
+                detailElement.querySelector('.total-price').value = (pricePerUnit * quantity).toFixed(2);
+                detailElement.querySelector('.uom-name').value = detailElement.querySelector('.product-select').selectedOptions[0].dataset.uom;
+            }
+
+            document.querySelectorAll('.product-select').forEach(selectElement => {
+                updateTotalPrice(selectElement.closest('.order-detail'));
+                selectElement.addEventListener('change', function() {
+                    updateTotalPrice(selectElement.closest('.order-detail'));
+                });
+            });
+
+            document.querySelectorAll('.quantity').forEach(inputElement => {
+                inputElement.addEventListener('input', function() {
+                    updateTotalPrice(inputElement.closest('.order-detail'));
+                });
+            });
+
+            document.getElementById('addProductBtn').addEventListener('click', function() {
+                const newDetail = document.querySelector('.order-detail').cloneNode(true);
+                newDetail.querySelectorAll('input').forEach(input => input.value = '');
+                newDetail.querySelector('.quantity').value = 1;
+                newDetail.querySelectorAll('select').forEach(select => select.value = select.querySelector('option').value);
+                document.getElementById('orderDetailsContainer').appendChild(newDetail);
+
+                newDetail.querySelector('.product-select').addEventListener('change', function() {
+                    updateTotalPrice(newDetail);
+                });
+
+                newDetail.querySelector('.quantity').addEventListener('input', function() {
+                    updateTotalPrice(newDetail);
+                });
+
+                updateTotalPrice(newDetail);
+            });
+
+            // Initialize total prices for all existing details
+            document.querySelectorAll('.order-detail').forEach(detail => {
+                updateTotalPrice(detail);
+            });
+        });
+    </script>
+{% endblock %}
